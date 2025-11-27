@@ -1,5 +1,5 @@
 obj-m   := colloid-mon.o
-KDIR    := /lib/modules/$(shell uname -r)/build
+KDIR    := /lib/modules/6.3.0-colloid/build
 KCONFIG_SCRIPTS := $(KDIR)/scripts/kconfig
 PWD := $(shell pwd)
 
@@ -78,9 +78,9 @@ endif
 EXTRA_CFLAGS += -DCORE_MON=$(CORE_MON)
 EXTRA_CFLAGS += -DLOCAL_NUMA=$(DEFAULT_TIER_NUMA)
 
-all: 
-	$(MAKE) -C $(KDIR) M=${PWD} SUBDIRS=$(PWD) modules
+all:
+	$(MAKE) CC=gcc-13 -C $(KDIR) M=${PWD} SUBDIRS=$(PWD) modules
 
 clean:
-	$(MAKE) -C $(KDIR) M=${PWD} SUBDIRS=$(PWD) clean
+	$(MAKE) CC=gcc-13 -C $(KDIR) M=${PWD} SUBDIRS=$(PWD) clean
 # rm -f *.ko *.o *.mod *.mod.c modules.order Module.symvers test

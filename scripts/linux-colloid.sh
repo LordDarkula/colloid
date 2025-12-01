@@ -4,13 +4,12 @@
 
 config=$1
 # gups_path=/home/midhul/colloid/apps/gups
-mio_path=/home/midhul/mio
-record_path=/home/midhul/colloid/colloid-stats
-stats_path=/home/midhul/membw-eval
-memeater_path=/home/midhul/colloid/tpp/memeater
-kswapdrst_path=/home/midhul/colloid/tpp/kswapdrst
-colloidmon_path=/home/midhul/colloid/tpp/colloid-mon
-scripts_path=/home/midhul/colloid/scripts
+mio_path=$HOME/mio
+record_path=$HOME/Workspaces/kernel-dev/colloid/colloid-stats
+stats_path=$HOME/membw-eval
+memeater_path=$HOME/Workspaces/kernel-dev/colloid/tpp/memeater
+kswapdrst_path=$HOME/Workspaces/kernel-dev/colloid/tpp/kswapdrst
+scripts_path=$HOME/Workspaces/kernel-dev/colloid/scripts
 local_numa=1
 local_size=32768
 # gups_workload=$2

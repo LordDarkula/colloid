@@ -16,7 +16,7 @@ DEFAULT_TIER ?= local-dram
 ALTERNATE_TIER ?= remote-dram
 
 # NUMA node for default tier
-DEFAULT_TIER_NUMA ?= 1
+DEFAULT_TIER_NUMA ?= 0
 
 # Core on which to run latency measurement
 # Should be a dedicated core on the default tier socket

@@ -1,7 +1,8 @@
 import sys, os, glob
 import argparse
+from pathlib import Path
 
-STATS_PATH = '/home/midhul/membw-eval'
+STATS_PATH = Path.home() / "membw-eval"
 
 def load_gups(d, filepath):
     with open(filepath, 'r') as f:

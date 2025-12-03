@@ -1,0 +1,100 @@
+# ----------------------------------------
+# Linux kernel build artifacts
+# (kernel lives in tpp/linux-6.3/)
+# ----------------------------------------
+
+# Top-level kernel outputs
+tpp/linux-6.3/vmlinux
+tpp/linux-6.3/System.map
+tpp/linux-6.3/vmlinux.*
+
+# Kernel images
+tpp/linux-6.3/arch/*/boot/zImage
+tpp/linux-6.3/arch/*/boot/bzImage
+tpp/linux-6.3/arch/*/boot/Image
+tpp/linux-6.3/arch/*/boot/uImage
+tpp/linux-6.3/arch/*/boot/*.dtb
+tpp/linux-6.3/arch/*/boot/*.dtbo
+
+# Modules and related metadata
+tpp/linux-6.3/**/*.ko
+tpp/linux-6.3/**/*.mod
+tpp/linux-6.3/**/*.mod.o
+tpp/linux-6.3/**/*.mod.c
+tpp/linux-6.3/Module.symvers
+tpp/linux-6.3/modules.order
+tpp/linux-6.3/modules.builtin
+tpp/linux-6.3/modules.builtin.modinfo
+tpp/linux-6.3/.tmp_versions/
+
+# Compile artifacts (BUT NOT .S / .c / .h)
+tpp/linux-6.3/**/*.o
+tpp/linux-6.3/**/*.a
+tpp/linux-6.3/**/*.i
+tpp/linux-6.3/**/*.su
+tpp/linux-6.3/**/*.lst
+tpp/linux-6.3/**/*.cmd
+tpp/linux-6.3/**/*.d
+tpp/linux-6.3/**/*.gcno
+tpp/linux-6.3/**/*.gcda
+
+# Kconfig & generated headers
+tpp/linux-6.3/.config
+tpp/linux-6.3/.config.old
+tpp/linux-6.3/.tmpconfig*
+tpp/linux-6.3/include/generated/
+tpp/linux-6.3/arch/*/include/generated/
+
+# LLVM/Clang builds
+tpp/linux-6.3/**/*.ll
+tpp/linux-6.3/**/*.lto.o
+tpp/linux-6.3/**/*.thinlto.bc
+
+# Packaging output
+tpp/linux-6.3/*.deb
+tpp/linux-6.3/*.rpm
+tpp/linux-6.3/*.tar*
+tpp/linux-6.3/debian/
+
+# Tools & perf builds
+tpp/linux-6.3/tools/**/*.o
+tpp/linux-6.3/tools/**/*.a
+tpp/linux-6.3/tools/**/*.so
+tpp/linux-6.3/tools/perf/util/*-flex.c
+tpp/linux-6.3/tools/perf/util/*-bison.c
+
+# Selftests artefacts
+tpp/linux-6.3/tools/testing/selftests/**/output
+tpp/linux-6.3/tools/testing/selftests/**/run.log
+tpp/linux-6.3/tools/testing/selftests/**/.tmp*
+
+# ----------------------------------------
+# Editor / IDE / Vim temp files
+# ----------------------------------------
+
+# Vim swap / undo / backup
+tpp/linux-6.3/**/*.swp
+tpp/linux-6.3/**/*.swo
+tpp/linux-6.3/**/*.swx
+tpp/linux-6.3/**/.*.swp
+tpp/linux-6.3/**/*.un~
+tpp/linux-6.3/*~
+tpp/linux-6.3/**/*.bak
+
+# Tags / cscope
+tpp/linux-6.3/tags
+tpp/linux-6.3/TAGS
+tpp/linux-6.3/cscope.*
+
+# Project config
+tpp/linux-6.3/.clangd/
+tpp/linux-6.3/.vscode/
+tpp/linux-6.3/.idea/
+
+# ----------------------------------------
+# Misc
+# ----------------------------------------
+tpp/linux-6.3/**/*.tmp
+tpp/linux-6.3/**/*.rej
+tpp/linux-6.3/**/*.orig
+

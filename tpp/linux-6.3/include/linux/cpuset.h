@@ -89,6 +89,21 @@ static inline bool cpuset_node_allowed(int node, gfp_t gfp_mask)
 	return true;
 }
 
+extern int __cpuset_node_allowed_part_1(int node);
+extern bool __cpuset_node_allowed_part_2(int node, gfp_t gfp_mask);
+
+static inline int cpuset_zone_allowed_part_1(struct zone *z)
+{
+	// cpusets_enabled_check will happen inside node_allowed function
+	return __cpuset_node_allowed_part_1(zone_to_nid(z));
+}
+
+static inline bool cpuset_zone_allowed_part_2(struct zone *z, gfp_t gfp_mask)
+{
+	// cpusets_enabled_check will happen inside node_allowed function
+	return __cpuset_node_allowed_part_2(zone_to_nid(z), gfp_mask);
+}
+
 static inline bool __cpuset_zone_allowed(struct zone *z, gfp_t gfp_mask)
 {
 	return __cpuset_node_allowed(zone_to_nid(z), gfp_mask);

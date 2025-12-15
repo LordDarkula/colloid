@@ -7010,7 +7010,7 @@ void mem_cgroup_calculate_protection(struct mem_cgroup *root,
 static int charge_memcg(struct folio *folio, struct mem_cgroup *memcg,
 			gfp_t gfp)
 {
-	struct cgroup_per_node *pn;
+	struct mem_cgroup_per_node *pn;
 	long nr_pages = folio_nr_pages(folio);
 	int nid, ret;
 

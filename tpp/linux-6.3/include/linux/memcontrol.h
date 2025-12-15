@@ -136,12 +136,30 @@ struct mem_cgroup_per_node {
 	bool			on_tree;
 	struct mem_cgroup	*memcg;		/* Back pointer, we cannot */
 						/* use container_of	   */
+		// Maximum number of pages that this cgroup can allocate on this node.
+		unsigned long max;
+
+		// Tracks number of currently allocated pages on this node for memcg.
+		struct page_counter memory;
 };
 
 struct mem_cgroup_threshold {
 	struct eventfd_ctx *eventfd;
 	unsigned long threshold;
 };
+
+// checks if a node can handle amount of memory requested
+extern bool memcg_node_allowed(int node, unsigned int order);
+
+static inline bool __memcg_zone_allowed(struct zone *z, unsigned int order)
+{
+	return memcg_node_allowed(zone_to_nid(z), order);
+}
+
+static inline bool __memcg_node_allowed(int node, unsigned int order)
+{
+	return memcg_node_allowed(node, order);
+}
 
 /* For threshold */
 struct mem_cgroup_threshold_ary {

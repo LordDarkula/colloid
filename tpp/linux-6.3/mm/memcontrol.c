@@ -5235,6 +5235,11 @@ static int alloc_mem_cgroup_per_node_info(struct mem_cgroup *memcg, int node)
 	lruvec_init(&pn->lruvec);
 	pn->memcg = memcg;
 
+	// when allocating a cgroup-specific info struct on a node,
+	// we set the node memory limit to the max possible
+	pn->max = PAGE_COUNTER_MAX;
+	page_counter_init(&pn->memory, NULL);
+
 	memcg->nodeinfo[node] = pn;
 	return 0;
 }
@@ -6617,6 +6622,51 @@ static int memory_numa_stat_show(struct seq_file *m, void *v)
 
 	return 0;
 }
+
+static int memory_max_per_node_show(struct seq_file *m, void *v)
+{
+	struct mem_cgroup *memcg = mem_cgroup_from_seq(m);
+	unsigned long max;
+	int nid;
+
+	for_each_node(nid) {
+		max = READ_ONCE(memcg->nodeinfo[nid]->max);
+		if (max == PAGE_COUNTER_MAX) {
+			seq_printf(m, "%d max\n", nid);
+		} else {
+			seq_printf(m, "%d %llu\n", nid, (u64)max * PAGE_SIZE);
+		}
+	}
+
+	return 0;
+}
+
+static ssize_t memory_max_per_node_write(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off)
+{
+	struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
+	struct mem_cgroup_per_node *node_info;
+	char *node_id_str;
+	unsigned long max;
+	int node_id, err;
+
+	buf = strstrip(buf);
+	node_id_str = strsep(&buf, " ");
+
+	if (!node_id_str || !buf || kstrtoint(node_id_str, 10, &node_id))
+		return -EINVAL;
+
+	if (node_id < 0 || node_id >= num_possible_nodes())
+		return -EINVAL;
+
+	err = page_counter_memparse(buf, "max", &max);
+	if (err)
+		return err;
+
+	node_info = memcg->nodeinfo[node_id];
+	xchg(&node_info->max, max);
+
+	return nbytes;
+}
 #endif
 
 static int memory_oom_group_show(struct seq_file *m, void *v)
@@ -6747,6 +6797,12 @@ static struct cftype memory_files[] = {
 	{
 		.name = "numa_stat",
 		.seq_show = memory_numa_stat_show,
+	},
+	{
+		.name = "max_per_node",
+		.flags = CFTYPE_NOT_ON_ROOT,
+		.seq_show = memory_max_per_node_show,
+		.write = memory_max_per_node_write,
 	},
 #endif
 	{
@@ -6954,8 +7010,9 @@ void mem_cgroup_calculate_protection(struct mem_cgroup *root,
 static int charge_memcg(struct folio *folio, struct mem_cgroup *memcg,
 			gfp_t gfp)
 {
+	struct cgroup_per_node *pn;
 	long nr_pages = folio_nr_pages(folio);
-	int ret;
+	int nid, ret;
 
 	ret = try_charge(memcg, gfp, nr_pages);
 	if (ret)
@@ -6963,6 +7020,13 @@ static int charge_memcg(struct folio *folio, struct mem_cgroup *memcg,
 
 	css_get(&memcg->css);
 	commit_charge(folio, memcg);
+
+	// charge per-node pages
+	nid = folio_nid(folio);
+	pn = memcg->node_info[nid];
+	if (pn) {
+		page_counter_charge(&pn->memory, nr_pages);
+	}
 
 	local_irq_disable();
 	mem_cgroup_charge_statistics(memcg, nr_pages);
@@ -7067,10 +7131,17 @@ static inline void uncharge_gather_clear(struct uncharge_gather *ug)
 
 static void uncharge_batch(const struct uncharge_gather *ug)
 {
+	struct mem_cgroup_per_node *pn;
 	unsigned long flags;
 
 	if (ug->nr_memory) {
 		page_counter_uncharge(&ug->memcg->memory, ug->nr_memory);
+
+		// credits per-node memory
+		pn = ug->memcg->nodeinfo[ug->nid];
+		if (pn) {
+			page_counter_uncharge(&pn->memory, ug->nr_memory);
+		}
 		if (do_memsw_account())
 			page_counter_uncharge(&ug->memcg->memsw, ug->nr_memory);
 		if (ug->nr_kmem)

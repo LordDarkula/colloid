@@ -4025,7 +4025,7 @@ int __cpuset_node_allowed_part_1(int node)
 	return 0;
 }
 
-bool cpuset_node_allowed_part_2(int node, gfp_t gfp_mask)
+bool __cpuset_node_allowed_part_2(int node, gfp_t gfp_mask)
 {
 	struct cpuset *cs;
 	bool allowed;

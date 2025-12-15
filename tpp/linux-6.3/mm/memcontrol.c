@@ -3977,6 +3977,40 @@ static unsigned long mem_cgroup_node_nr_lru_pages(struct mem_cgroup *memcg,
 	return nr;
 }
 
+bool memcg_node_allowed(int node, unsigned int order)
+{
+	struct mem_cgroup *memcg;
+	struct mem_cgroup_per_node *pn;
+	unsigned long max, current_pages;
+
+	memcg = mem_cgroup_from_task(current);
+	if (!memcg)
+		return true;
+
+	pn = memcg->nodeinfo[node];
+	if (!pn)
+		return true;
+
+	max = READ_ONCE(pn->max);
+	if (max == PAGE_COUNTER_MAX)
+		return true;
+
+	current_pages = page_counter_read(&pn->memory);
+
+	// todo (matteo olivi): if the following branch is taken, drain the per-CPU stocks for this
+	// cgroup. Otherwise, the stock pages are stranded. I didn't do that because in the machines
+	// where I was running my experiments the largest possible stock for a cgroup (cumulatively over
+	// all CPUs) is 32 MiB => the amount of waste is negligible. But in production we'd want to
+	// avoid that.
+	if (current_pages >= max)
+		return false;
+
+	//! I wonder what happens if the node can allocate some, but not all pages.
+	// Is some allocation further down the line going to take care of splitting blocks (is it
+	// even correct to split them??).
+	return (max - current_pages) >= (1 << order);
+}
+
 static unsigned long mem_cgroup_nr_lru_pages(struct mem_cgroup *memcg,
 					     unsigned int lru_mask,
 					     bool tree)

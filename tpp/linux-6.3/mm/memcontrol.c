@@ -7023,7 +7023,7 @@ static int charge_memcg(struct folio *folio, struct mem_cgroup *memcg,
 
 	// charge per-node pages
 	nid = folio_nid(folio);
-	pn = memcg->node_info[nid];
+	pn = memcg->nodeinfo[nid];
 	if (pn) {
 		page_counter_charge(&pn->memory, nr_pages);
 	}

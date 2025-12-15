@@ -334,6 +334,10 @@ int next_demotion_node(int node)
 	target = node_random(&nd->preferred);
 	rcu_read_unlock();
 
+	if (!__memcg_node_allowed(target, 1)) {
+		return NUMA_NO_NODE;
+	}
+
 	return target;
 }
 EXPORT_SYMBOL_GPL(next_demotion_node);
